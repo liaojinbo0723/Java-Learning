@@ -1,7 +1,6 @@
 package com.neo.datamanager;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -21,7 +20,7 @@ import java.io.*;
 /**
  * 更新xml节点内容,删除节点,更新节点
  */
-public class Modify_File {
+public class ModifyFile {
 
 	/**
 	 * 获取文件
@@ -180,7 +179,7 @@ public class Modify_File {
 	public static void main(String[] args) {
 		String src_dir = "D:\\nbd\\002_scheduler\\02_kettle\\bi";
 		String tag_dir = src_dir + "_new";
-		Modify_File mf = new Modify_File();
+		ModifyFile mf = new ModifyFile();
 		File file = new File(src_dir);
 		mf.deleteDir(tag_dir);
 		System.out.println("目录:" + tag_dir + "删除完成!!!");

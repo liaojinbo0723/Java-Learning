@@ -5,7 +5,7 @@ import java.sql.*;
  * java 连接mysql公共类
  */
 
-public class For_ConnMysql {
+public class ForConnMysql {
 	public static final String driverName = "com.mysql.jdbc.Driver";
 	public Connection conn_Mysql(String url,String user,String pass){
 		Connection conn = null;
@@ -55,7 +55,7 @@ public class For_ConnMysql {
 		System.out.println("fuck you!!");
 		String db_name ;
 		String col_name ;
-		For_ConnMysql fc = new For_ConnMysql();
+		ForConnMysql fc = new ForConnMysql();
 		Connection conn = fc.conn_Mysql("jdbc:mysql://10.17.2.134:3306/data_dev","root","xiaoniu1234");
 		String v_sql = "select t.src_table_name,t.src_column_name from data_dev.src_table_detail t limit 10; ";
 		ResultSet rs = fc.query_Sql(v_sql,conn);

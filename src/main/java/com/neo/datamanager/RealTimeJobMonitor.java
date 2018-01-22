@@ -20,7 +20,7 @@ public class RealTimeJobMonitor {
     private void getJobname(){
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String cur_date = sdf.format(new Date());
-        For_ConnMysql fc = new For_ConnMysql();
+        ForConnMysql fc = new ForConnMysql();
         Properties prop = getConfigInfo();
         String db_url = prop.getProperty("mss_jdbc_url");
         String db_user = prop.getProperty("mss_jdbc_username");
