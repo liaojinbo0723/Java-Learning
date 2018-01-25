@@ -7,7 +7,7 @@ import java.sql.*;
 
 public class ForConnMysql {
 	public static final String driverName = "com.mysql.jdbc.Driver";
-	public Connection conn_Mysql(String url,String user,String pass){
+	public Connection connMysql(String url,String user,String pass){
 		Connection conn = null;
 		try {
 			Class.forName(driverName);//加载驱动
@@ -24,7 +24,7 @@ public class ForConnMysql {
 		return conn;
 	}
 
-	public ResultSet query_Sql(String v_sql,Connection conn){
+	public ResultSet querySql(String v_sql,Connection conn){
 		ResultSet rs = null;
 		try{
 			Statement stm = conn.createStatement();//获取句柄，用来执行sql
@@ -36,7 +36,7 @@ public class ForConnMysql {
 		return rs;
 	}
 
-	public boolean dml_Sql(String v_sql,Connection conn){
+	public boolean dmlSql(String v_sql,Connection conn){
 		boolean flag;
 		try{
 			Statement stm = conn.createStatement();//获取句柄，用来执行sql
@@ -53,17 +53,17 @@ public class ForConnMysql {
 
 	public static void main(String[] args) {
 		System.out.println("fuck you!!");
-		String db_name ;
-		String col_name ;
+		String dbname ;
+		String colname ;
 		ForConnMysql fc = new ForConnMysql();
-		Connection conn = fc.conn_Mysql("jdbc:mysql://10.17.2.134:3306/data_dev","root","xiaoniu1234");
-		String v_sql = "select t.src_table_name,t.src_column_name from data_dev.src_table_detail t limit 10; ";
-		ResultSet rs = fc.query_Sql(v_sql,conn);
+		Connection conn = fc.connMysql("jdbc:mysql://10.17.2.134:3306/data_dev","root","xiaoniu1234");
+		String sql = "select t.src_table_name,t.src_column_name from data_dev.src_table_detail t limit 10; ";
+		ResultSet rs = fc.querySql(sql,conn);
 		try {
 			while (rs.next()) {
-				db_name = rs.getString(1);
-				col_name = rs.getString(2);
-				System.out.println("db:" + db_name + "\t" + "col_name:" + col_name);
+				dbname = rs.getString(1);
+				colname = rs.getString(2);
+				System.out.println("db:" + dbname + "\t" + "col_name:" + colname);
 			}
 			rs.close();//关闭游标
 			conn.close();//关闭连接

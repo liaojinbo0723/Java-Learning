@@ -25,7 +25,7 @@ public class RealTimeJobMonitor {
         String db_url = prop.getProperty("mss_jdbc_url");
         String db_user = prop.getProperty("mss_jdbc_username");
         String db_pass = prop.getProperty("mss_jdbc_password");
-        Connection conn_db = fc.conn_Mysql(db_url,db_user,db_pass);
+        Connection conn_db = fc.connMysql(db_url,db_user,db_pass);
         String v_sql = "select t.job_name,t.start_time,a.job_id,t.record_id from mss.run_job_record t " +
                 " inner join mss.cm_job a " +
                 " on t.job_name = a.JOB_NAME and a.IS_ENABLE = 1 " +
@@ -33,28 +33,28 @@ public class RealTimeJobMonitor {
                 " on a.GROUP_ID = b.GROUP_ID and b.G_NAME in ('stg_zx99_realtime','dwd_zx_pub_realtime','dwd_zx_realtime','dwd_zx_realtime_rpt') " +
                 " where t.start_time>=curdate() " +
                 " and t.status = 0";
-        ResultSet rs = fc.query_Sql(v_sql,conn_db);
+        ResultSet rs = fc.querySql(v_sql,conn_db);
         int timeout_flag = 0;
         try {
             while (rs.next()){
-                String str_jobname = rs.getString(1);
-                String str_start = rs.getString(2);
-                String str_jobid = rs.getString(3);
-                String str_recordid = rs.getString(4);
-                Date dt_start = sdf.parse(str_start);
+                String jobname = rs.getString(1);
+                String start = rs.getString(2);
+                String jobid = rs.getString(3);
+                String recordid = rs.getString(4);
+                Date dt_start = sdf.parse(start);
                 Date dt = new Date();
                 Long sec = (dt.getTime() - dt_start.getTime())/1000;
                 if (sec >= 900){
                     timeout_flag = 1;
-                    System.out.println(cur_date + "  job_name:" + str_jobname + "执行超时!!");
+                    System.out.println(cur_date + "  job_name:" + jobname + "执行超时!!");
                     phoneAlarm();
-                    String v_update_sts = "update mss.cm_run_job set state = 3 where job_id = '" + str_jobid
+                    String v_update_sts = "update mss.cm_run_job set state = 3 where job_id = '" + jobid
                     + "' and state = 2";
-                    String v_update_log = "update mss.run_job_record set status = 2 where record_id = '" + str_recordid
+                    String v_update_log = "update mss.run_job_record set status = 2 where record_id = '" + recordid
                     + "' and status = 0";
-                    fc.dml_Sql(v_update_log,conn_db);
-                    fc.dml_Sql(v_update_sts,conn_db);
-                    System.out.println(cur_date + "  job_name:" + str_jobname + "状态更新成功");
+                    fc.dmlSql(v_update_log,conn_db);
+                    fc.dmlSql(v_update_sts,conn_db);
+                    System.out.println(cur_date + "  job_name:" + jobname + "状态更新成功");
                 }
 
             }
