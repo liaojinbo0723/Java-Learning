@@ -25,32 +25,29 @@ public class ModifyFile {
 	/**
 	 * 获取文件
 	 * @param dir
-	 * @param v_src_dir
-	 * @param v_tag_dir
+
 	 */
-	public void createFile(File dir,String v_src_dir,String v_tag_dir,String [] v_keys){
+	public void createFile(File dir,String srcDir,String tagDir,String [] keys){
 		File[] files = dir.listFiles();
 		for (int i = 0; i < files.length; i++) {
 			File f = files[i];
 			if (f.isFile()){
 				if (f.getName().contains(".kjb")){
-					writeFile(f,v_src_dir,v_tag_dir,v_keys);
+					writeFile(f,srcDir,tagDir,keys);
 				}
 			}
 			if(f.isDirectory()){
-				createFile(f,v_src_dir,v_tag_dir,v_keys);
+				createFile(f,srcDir,tagDir,keys);
 			}
 		}
 	}
 
 	/**
 	 * 删除目录以及目录下的所有文件以及文件夹
-	 * @param v_dir
-	 * @return
 	 */
-	public Boolean deleteDir(String v_dir){
+	public Boolean deleteDir(String dir){
 		Boolean flag = false;
-		File td = new File(v_dir);
+		File td = new File(dir);
 		if(!td.exists()){
 			return false;
 		}
@@ -74,27 +71,23 @@ public class ModifyFile {
 
 	/**
 	 * 生成新文件
-	 * @param file
-	 * @param v_src_dir
-	 * @param v_tag_dir
-	 * @param v_keys
 	 */
-	public void writeFile(File file,String v_src_dir,String v_tag_dir,String [] v_keys){
+	public void writeFile(File file,String srcDir,String tagDir,String [] keys){
 		try {
 			InputStream is = new FileInputStream(file);
 			BufferedReader br = new BufferedReader(new InputStreamReader(is));
 			String filename = file.getName();
-			File tmp_file = new File(file.getParentFile().getAbsolutePath().replace(v_src_dir,v_tag_dir) + "\\" + filename.split("\\.")[0] + ".kjb");
-			if(!tmp_file.getParentFile().exists()){
-				boolean result = tmp_file.getParentFile().mkdirs();
+			File tmpFile = new File(file.getParentFile().getAbsolutePath().replace(srcDir,tagDir) + "\\" + filename.split("\\.")[0] + ".kjb");
+			if(!tmpFile.getParentFile().exists()){
+				boolean result = tmpFile.getParentFile().mkdirs();
 				if (!result){
 					System.out.println("目录已经存在!!");
 				}
 			}
-			if (tmp_file.exists()){
-				tmp_file.delete();
+			if (tmpFile.exists()){
+				tmpFile.delete();
 			}
-			BufferedWriter bw = new BufferedWriter(new FileWriter(tmp_file,true));
+			BufferedWriter bw = new BufferedWriter(new FileWriter(tmpFile,true));
 			String old_content = null;
 			while (true){
 				old_content = br.readLine();
@@ -106,8 +99,8 @@ public class ModifyFile {
 			is.close();
 			br.close();
 			bw.close();
-			repaceXML(tmp_file,v_keys);
-			System.out.println("文件生成成功:" + tmp_file);
+			repaceXML(tmpFile,keys);
+			System.out.println("文件生成成功:" + tmpFile);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -118,16 +111,16 @@ public class ModifyFile {
 	/**
 	 * 1、删除父节点connection以及所有子节点
 	 * 2、把父节点job-log-table以及jobentry-log-table下的三个子节点的值更新为空
-	 * @param v_file
-	 * @param v_keys
+	 * @param file
+	 * @param keys
 	 */
-	public void repaceXML(File v_file,String [] v_keys){
+	public void repaceXML(File file,String [] keys){
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		try {
 			DocumentBuilder db = dbf.newDocumentBuilder();
-			Document doc = 	db.parse(v_file);
-			for (int k = 0; k < v_keys.length; k++) {
-				NodeList nl = doc.getElementsByTagName(v_keys[k]);
+			Document doc = 	db.parse(file);
+			for (int k = 0; k < keys.length; k++) {
+				NodeList nl = doc.getElementsByTagName(keys[k]);
 				for (int i = 0; i < nl.getLength(); i++) {
 					Node conn_node = nl.item(i);
 //					//获取当前节点的属性
@@ -143,16 +136,16 @@ public class ModifyFile {
 						Node child = childNods.item(j);
 						String nodename = child.getNodeName();
 						String nodevaule = child.getTextContent();
-						if(v_keys[k] == "connection") {
+						if(keys[k] == "connection") {
 							if (nodename == "username" && nodevaule.contains("XN_CM_LOG_DB_USER")) {
 								conn_node.getParentNode().removeChild(conn_node);
-								System.out.println("节点:" + v_keys[k] + " 删除成功!!");
+								System.out.println("节点:" + keys[k] + " 删除成功!!");
 								break;
 							}
 						}else{
 							if(nodename == "connection"||nodename == "schema"||nodename == "table"){
 								child.setTextContent("");
-								System.out.println("父节点:" + v_keys[k] + "下的子节点:" + nodename + "的值更新为空!");
+								System.out.println("父节点:" + keys[k] + "下的子节点:" + nodename + "的值更新为空!");
 							}
 						}
 					}
@@ -162,7 +155,7 @@ public class ModifyFile {
 			Transformer transformer = transFactory.newTransformer();
 			DOMSource domSource = new DOMSource();
 			domSource.setNode(doc);
-			StreamResult result = new StreamResult(v_file);
+			StreamResult result = new StreamResult(file);
 			transformer.transform(domSource, result);
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
@@ -177,13 +170,13 @@ public class ModifyFile {
 		}
 	}
 	public static void main(String[] args) {
-		String src_dir = "D:\\nbd\\002_scheduler\\02_kettle\\bi";
-		String tag_dir = src_dir + "_new";
+		String srcDir = "D:\\nbd\\002_scheduler\\02_kettle\\bi";
+		String tagDir = srcDir + "_new";
 		ModifyFile mf = new ModifyFile();
-		File file = new File(src_dir);
-		mf.deleteDir(tag_dir);
-		System.out.println("目录:" + tag_dir + "删除完成!!!");
+		File file = new File(srcDir);
+		mf.deleteDir(tagDir);
+		System.out.println("目录:" + tagDir + "删除完成!!!");
 		String [] keys = {"connection","job-log-table","jobentry-log-table"};
-		mf.createFile(file,src_dir,tag_dir,keys);
+		mf.createFile(file,srcDir,tagDir,keys);
 	}
 }
