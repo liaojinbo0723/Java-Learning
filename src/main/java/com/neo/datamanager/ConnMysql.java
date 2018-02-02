@@ -5,7 +5,7 @@ import java.sql.*;
  * java 连接mysql公共类
  */
 
-public class ForConnMysql {
+public class ConnMysql {
 	public static final String driverName = "com.mysql.jdbc.Driver";
 	public Connection connMysql(String url,String user,String pass){
 		Connection conn = null;
@@ -55,7 +55,7 @@ public class ForConnMysql {
 		System.out.println("fuck you!!");
 		String dbname ;
 		String colname ;
-		ForConnMysql fc = new ForConnMysql();
+		ConnMysql fc = new ConnMysql();
 		Connection conn = fc.connMysql("jdbc:mysql://10.8.34.67:3306/dm","zxbi_rw","y-1stpp6RkpY");
 		String sql = "load data local infile 'result.txt' into table adw.t_user_person_temp fields terminated by '\t'";
 		fc.dmlSql(sql,conn);

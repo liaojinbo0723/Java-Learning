@@ -25,6 +25,8 @@
 		<hadoop.version>2.6.0-cdh5.7.0</hadoop.version>
 		<hive.version>1.1.0-cdh5.7.0</hive.version>
 		<desense.version>1.3</desense.version>
+		<spark.version>2.0.2</spark.version>
+        <scala.version>2.11</scala.version>
 	</properties>
 
 	<repositories>
@@ -102,6 +104,33 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.6</version>
 		</dependency>
+
+		<!-- spark相关jar包 -->
+		<dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-core_${scala.version}</artifactId>
+            <version>${spark.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-streaming_${scala.version}</artifactId>
+            <version>${spark.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-sql_${scala.version}</artifactId>
+            <version>${spark.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-hive_${scala.version}</artifactId>
+            <version>${spark.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-mllib_${scala.version}</artifactId>
+            <version>${spark.version}</version>
+        </dependency>
 
 	</dependencies>
 </project>

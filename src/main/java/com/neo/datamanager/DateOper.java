@@ -7,7 +7,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-public class ForDateOper {
+public class DateOper {
 
     /**
      * 将短时间格式字符串转换为时间 yyyy-MM-dd

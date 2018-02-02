@@ -72,7 +72,7 @@ public class ForRandomList {
      */
     private void getListInit(List list1,List list2,List list3) {
 
-        ForConnMysql fc = new ForConnMysql();
+        ConnMysql fc = new ConnMysql();
         Properties prop = getConfigInfo();
         String dburl = prop.getProperty("zx_jdbc_url");
         String dbuser = prop.getProperty("zx_jdbc_username");
@@ -95,7 +95,7 @@ public class ForRandomList {
 
     private void delListid(List listTmp){
         String strList = String.join(",",listTmp);
-        ForConnMysql fc = new ForConnMysql();
+        ConnMysql fc = new ConnMysql();
         Properties prop = getConfigInfo();
         String dburl = prop.getProperty("zx_jdbc_url");
         String dbuser = prop.getProperty("zx_jdbc_username");
@@ -116,7 +116,7 @@ public class ForRandomList {
 
       private void updateListid(List list1,List list2){
         String str_list = String.join(",",list1);
-        ForConnMysql fc = new ForConnMysql();
+        ConnMysql fc = new ConnMysql();
         Properties prop = getConfigInfo();
         String dburl = prop.getProperty("zx_jdbc_url");
         String dbuser = prop.getProperty("zx_jdbc_username");
@@ -147,7 +147,7 @@ public class ForRandomList {
 
     private Boolean randomFlag(List listid) {
         String str_list = String.join(",",listid);
-        ForConnMysql fc = new ForConnMysql();
+        ConnMysql fc = new ConnMysql();
         Properties prop = getConfigInfo();
         String dburl = prop.getProperty("zx_jdbc_url");
         String dbuser = prop.getProperty("zx_jdbc_username");
