@@ -48,5 +48,6 @@ public class Test  {
     public static void main(String[] args) {
         Properties prop = getConfigInfoOut();
         System.out.println(prop.getProperty("user"));
+        System.out.println(System.getProperty("file.separator"));
     }
 }
