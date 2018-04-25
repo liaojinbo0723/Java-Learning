@@ -8,24 +8,38 @@ import java.util.regex.Pattern;
 
 public class RegMatch {
 
-    public static List<String> getFile(String filePath) {
+    List<String> joblist = new ArrayList<String>();
+
+    /**
+     * 递归取出job的绝对路径
+     *
+     * @param filePath
+     * @return
+     */
+    public List<String> getFile(String filePath) {
         File file = new File(filePath);
-        List<String> list = new ArrayList();
         File[] files = file.listFiles();
         for (int i = 0; i < files.length; i++) {
             File f = files[i];
             if (f.isFile()) {
                 if (f.getName().contains(".kjb")) {
-                    list.add(f.getAbsolutePath());
+                    joblist.add(f.getAbsolutePath());
                 }
             }
             if (f.isDirectory()) {
                 getFile(f.getAbsolutePath());
             }
         }
-        return list;
+        return joblist;
     }
 
+    /**
+     * * 读取job的内容
+     *
+     * @param filename
+     * @return
+     * @throws IOException
+     */
     public static String getString(String filename) throws IOException {
         File file = new File(filename);
         FileReader reader = new FileReader(file);
@@ -37,32 +51,39 @@ public class RegMatch {
         }
         bReader.close();
         return sb.toString().toLowerCase();
-
     }
 
+    /**
+     * 正则匹配from和join后的表名
+     *
+     * @param file
+     * @throws IOException
+     */
     public static void matchJob(String file) throws IOException {
-        List<String> list = new ArrayList();
-        list.add("\\s+from\\s+(\\w+)[.](\\w+)");
-        list.add("\\s+join\\s+(\\w+)[.](\\w+)");
+        String str = "\\s+(from|join)\\s+(\\w+)[.](\\w+)";
         String sql = getString(file);
         Pattern p = null;
         String result = "";
-        for (int i = 0; i < list.size(); i++) {
-            p = Pattern.compile(list.get(i));
-            Matcher matcher = p.matcher(sql);
+        p = Pattern.compile(str);
+        Matcher matcher = p.matcher(sql);
+        if (file.contains("job_stg")) {
+
+        } else if (file.contains("job_ods")) {
+            result = new File(file).getName().replace("job_ods", "job_stg");
+        } else {
             while (matcher.find()) {
-                String string1 = "job_" + matcher.group(2);
+                String string1 = "job_" + matcher.group(3);
                 result = result + "@" + string1;
             }
         }
-        System.out.println(new File(file).getName() + ":" + result);
+        System.out.println(new File(file).getName() + "----->" + result);
     }
 
     public static void main(String[] args) throws IOException {
-        List<String> fileList = getFile("F:\\ETL");
-        for (int i = 0; i < fileList.size(); i++) {
-            matchJob(fileList.get(i));
+        String filePath = "D:\\nbd\\002_scheduler\\02_kettle\\bi\\zx";
+        List<String> resultList = (new RegMatch()).getFile(filePath);
+        for (int i = 0; i < resultList.size(); i++) {
+            matchJob(resultList.get(i));
         }
-
     }
 }

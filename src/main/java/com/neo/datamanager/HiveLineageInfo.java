@@ -102,7 +102,72 @@ public class HiveLineageInfo implements NodeProcessor {
     }
 
     public static void main(String[] args) throws IOException, ParseException, SemanticException {
-        String query = "insert into table aa  select * from bb union all select * from cc";
+        String query =
+                "INSERT overwrite table dma_zxopr_data.Rpt_Channel_Daily_Natural\n" +
+                "select Static_Date,--统计日期\n" +
+                "       Channel_Group,--渠道所属组\n" +
+                "       Channel_Name,--渠道名\n" +
+                "       Channel_Platform,--渠道所属平台\n" +
+                "       Word,--关键词\n" +
+                "       sum(Register_Count) as Register_Count,--注册人数\n" +
+                "       SUM(Real_Name_Count) AS Real_Name_Count,--实名人数\n" +
+                "       SUM(Bind_Card_Count) AS Bind_Card_Count,--绑卡人数\n" +
+                "       SUM(Recharge_Count) AS Recharge_Count,--充值人数\n" +
+                "       SUM(Invest_Count) AS Invest_Count,--投资人数\n" +
+                "       SUM(Invest_Amount) AS Invest_Amount,--投资金额\n" +
+                "       from_unixtime(unix_timestamp(), 'yyyy-MM-dd HH:mm:ss') AS Process_Time\n" +
+                "  from (select Static_Date,\n" +
+                "               Channel_Group,\n" +
+                "               Channel_Name,\n" +
+                "               Channel_Platform,\n" +
+                "               Word,\n" +
+                "               Register_Count,\n" +
+                "               Real_Name_Count,\n" +
+                "               Bind_Card_Count,\n" +
+                "               Recharge_Count,\n" +
+                "               Invest_Count,\n" +
+                "               Invest_Amount\n" +
+                "          from tmp_datamanagement_od.TMP_Rpt_Channel_Daily_Natural_1\n" +
+                "        union all\n" +
+                "        SELECT Static_Date,\n" +
+                "               Channel_Group,\n" +
+                "               Channel_Name,\n" +
+                "               Channel_Platform,\n" +
+                "               Word,\n" +
+                "               Register_Count,\n" +
+                "               Real_Name_Count,\n" +
+                "               Bind_Card_Count,\n" +
+                "               Recharge_Count,\n" +
+                "               Invest_Count,\n" +
+                "               Invest_Amount\n" +
+                "          FROM tmp_datamanagement_od.TMP_Rpt_Channel_Daily_Natural_2\n" +
+                "        UNION ALL\n" +
+                "        SELECT Static_Date,\n" +
+                "               Channel_Group,\n" +
+                "               Channel_Name,\n" +
+                "               Channel_Platform,\n" +
+                "               Word,\n" +
+                "               Register_Count,\n" +
+                "               Real_Name_Count,\n" +
+                "               Bind_Card_Count,\n" +
+                "               Recharge_Count,\n" +
+                "               Invest_Count,\n" +
+                "               Invest_Amount\n" +
+                "          FROM tmp_datamanagement_od.TMP_Rpt_Channel_Daily_Natural_3\n" +
+                "        UNION ALL\n" +
+                "        SELECT Static_Date,\n" +
+                "               Channel_Group,\n" +
+                "               Channel_Name,\n" +
+                "               Channel_Platform,\n" +
+                "               Word,\n" +
+                "               Register_Count,\n" +
+                "               Real_Name_Count,\n" +
+                "               Bind_Card_Count,\n" +
+                "               Recharge_Count,\n" +
+                "               Invest_Count,\n" +
+                "               Invest_Amount\n" +
+                "          FROM tmp_datamanagement_od.TMP_Rpt_Channel_Daily_Natural_4) a\n" +
+                " group by Static_Date, Channel_Group, Channel_Name, Channel_Platform, Word\n";
         HiveLineageInfo lep = new HiveLineageInfo();
         lep.getLineageInfo(query);
         System.out.println("Input tables = " + lep.getInputTableList());
