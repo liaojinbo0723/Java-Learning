@@ -67,7 +67,7 @@ public class RegMatch {
         p = Pattern.compile(str);
         Matcher matcher = p.matcher(sql);
         if (file.contains("job_stg")) {
-
+            System.out.println(file);
         } else if (file.contains("job_ods")) {
             result = new File(file).getName().replace("job_ods", "job_stg");
         } else {
