@@ -170,7 +170,7 @@ public class ModifyFile {
 		}
 	}
 	public static void main(String[] args) {
-		String srcDir = "D:\\nbd\\002_scheduler\\02_kettle\\bi";
+		String srcDir = "D:\\git_prod\\job_pro\\kettle\\bi\\nyd";
 		String tagDir = srcDir + "_new";
 		ModifyFile mf = new ModifyFile();
 		File file = new File(srcDir);

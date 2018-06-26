@@ -1,10 +1,7 @@
 package com.neo.datamanager;
 
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Properties;
 
 public class Test  {
@@ -45,9 +42,18 @@ public class Test  {
         return prop;
     }
 
+    public void getPath(){
+        String path = System.getProperty("java.class.path");
+        int firstIndex = path.lastIndexOf(System.getProperty("path.separator")) + 1;
+        int lastIndex = path.lastIndexOf(File.separator) + 1;
+        path = path.substring(firstIndex, lastIndex);
+        System.out.println(path);
+    }
+
     public static void main(String[] args) {
-        Properties prop = getConfigInfoOut();
-        System.out.println(prop.getProperty("user"));
-        System.out.println(System.getProperty("file.separator"));
+//        Properties prop = getConfigInfoOut();
+//        System.out.println(prop.getProperty("user"));
+//        System.out.println(getConfigInfoIn().getProperty("xx"));
+        new Test().getPath();
     }
 }
