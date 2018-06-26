@@ -47,7 +47,7 @@ public class UDFArrayList extends GenericUDF {
         String str = args[0].get().toString();
         String[] s = str.split(",");
         for (String word:s){
-//            System.out.println(word);
+            System.out.println(word);
             res.add(word);
         }
         return res;
