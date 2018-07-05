@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 /**
  * java api操作hdfs
  */
-public class DelHDFS {
+public class DataCleanHdfs {
 
     public static final Long lastYear = DateOper.strToDate("2017-07-04").getTime();
 
@@ -93,7 +93,7 @@ public class DelHDFS {
         if (file.exists()) {
             file.delete();
         }
-        DelHDFS.listAllFiles(file);
+        DataCleanHdfs.listAllFiles(file);
 
     }
 }
