@@ -22,6 +22,13 @@ public class DateOper {
         return strtodate;
     }
 
+    public static Long strToLong(String strDate) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        ParsePosition pos = new ParsePosition(0);
+        Long result = formatter.parse(strDate, pos).getTime();
+        return result;
+    }
+
     /**
      * 将短时间格式时间转换为字符串 yyyy-MM-dd
      *
@@ -31,6 +38,14 @@ public class DateOper {
      */
     public static String dateToStr(Date dateDate) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String dateString = formatter.format(dateDate);
+        return dateString;
+    }
+
+
+
+     public static String dateToStr2(Date dateDate) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String dateString = formatter.format(dateDate);
         return dateString;
     }

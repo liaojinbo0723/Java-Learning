@@ -84,4 +84,9 @@ public class RowSeq extends GenericUDF {
                 + " is not properly formed");
     }
 
+
+    public static void main(String[] args) {
+//        System.out.println(new RowSeq().getInitId("attempt_1478926768563_0537_m_000004_0",5));
+    }
+
 }

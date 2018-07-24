@@ -11,14 +11,14 @@ public class DataDecryptXnzx extends UDF{
     }
 
     public static void main(String[] args) {
-        String idCardNo = "D9eK10MnhNMDKE0YsIhEXg9e23IsITKFMVFevP+hb3Qo=";
-        String mobile = "T56dIOajlCm8tji3s+p61HQ==";
-        String name = "G/a2yRoXQ3BcN1wBnOe0cXw==";
+        String idCardNo = "D9eK17MzkNcHIE04tIxARiNW03I8NcaBOVlWtPepZ3wg=";
+//        String mobile = "T56dIOajlCm8tji3s+p61HQ==";
+//        String name = "G/a2yRoXQ3BcN1wBnOe0cXw==";
 //        String email = null;
 //        System.out.println("email = " + DecryptService.decryptData(email));
-        System.out.println("name = " + DecryptService.decryptData(name));
+//        System.out.println("name = " + DecryptService.decryptData(name));
 //        System.out.println("mobile = " + DecryptService.decryptData(mobile));
         System.out.println("idCardNo = " + DecryptService.decryptIdNo(idCardNo));
-        System.out.println("111 ");
+        System.out.println("111");
     }
 }
