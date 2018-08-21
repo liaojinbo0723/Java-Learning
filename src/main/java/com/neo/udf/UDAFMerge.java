@@ -31,7 +31,8 @@ public class UDAFMerge extends AbstractGenericUDAFResolver {
         if (info.length != 2) {
             throw new UDFArgumentTypeException(info.length, "the number of params must is two!");
         }
-
+//        System.out.println(info[0].getTypeName());
+//        System.out.println(info[1].getTypeName());
         ObjectInspector oi = TypeInfoUtils.getStandardJavaObjectInspectorFromTypeInfo(info[0]);
         if (!ObjectInspectorUtils.compareSupported(oi)) {
             throw new UDFArgumentTypeException(0, "Cannot support comparison of map<> type or complex type containing map<>.");
@@ -70,7 +71,7 @@ public class UDAFMerge extends AbstractGenericUDAFResolver {
         }
 
         /**
-         * 存储sum的值的类
+         * 存储每一次遍历的结果类
          */
         static class MergeAgg implements AggregationBuffer {
             int dataSrc = 9999;
@@ -142,8 +143,8 @@ public class UDAFMerge extends AbstractGenericUDAFResolver {
         }
     }
 
-    public static void main(String[] args) {
-        System.out.println("helloworld");
+    public static void main(String[] args) throws SemanticException {
+        System.out.println("123");
     }
 }
 

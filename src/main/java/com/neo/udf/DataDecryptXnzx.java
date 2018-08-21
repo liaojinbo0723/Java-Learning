@@ -11,7 +11,7 @@ public class DataDecryptXnzx extends UDF{
     }
 
     public static void main(String[] args) {
-        String idCardNo = "D9eK17MzkNcHIE04tIxARiNW03I8NcaBOVlWtPepZ3wg=";
+        String idCardNo = "EMnV5klgPr2nPFUYR+5d3ea6dwsCPgkrxJ4gcbnqfRNA=";
 //        String mobile = "T56dIOajlCm8tji3s+p61HQ==";
 //        String name = "G/a2yRoXQ3BcN1wBnOe0cXw==";
 //        String email = null;
