@@ -96,7 +96,8 @@ public class ExportDataUserPerson {
                 "ifnull(lstModTime,''),\n" +
                 "ifnull(syncCreateTime,''),\n" +
                 "ifnull(syncUpdateTime,''),\n" +
-                "ifnull(digest,'') from xnaccount.t_user_person where createTime >= '" + strDate + "'";
+                "ifnull(digest,'') from xnaccount.t_user_person where createTime >= '" + strDate + "'" +
+                " or syncUpdateTime >= '" + strDate + "'";
         System.out.println(MessageFormat.format("sql:{0}", sql));
         ResultSet rs = fc.querySql(sql, conn);
         int count = 1;

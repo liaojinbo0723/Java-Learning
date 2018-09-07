@@ -23,7 +23,7 @@ public class DateOper {
     }
 
     public static Long strToLong(String strDate) {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         ParsePosition pos = new ParsePosition(0);
         Long result = formatter.parse(strDate, pos).getTime();
         return result;
