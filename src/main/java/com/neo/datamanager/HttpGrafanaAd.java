@@ -49,7 +49,7 @@ public class HttpGrafanaAd {
                 HttpEntity resEntity = response.getEntity();
                 if (resEntity != null) {
                     result = EntityUtils.toString(resEntity, charset);
-                    writeFile("succ.txt",result);
+                    //writeFile("succ.txt",result);
                     loginSucc(result);
 
                 }
@@ -92,6 +92,46 @@ public class HttpGrafanaAd {
         return result;
     }
 
+    /**
+     * 获取索引记录条数
+     * @param url
+     * @param jsonstr
+     * @param token
+     * @param charset
+     * @return
+     */
+    @SuppressWarnings("resource")
+    public static int getIndexCnt(String url, String jsonstr, String token, String charset){
+        HttpClient httpClient = null;
+        HttpPost httpPost = null;
+        int logCnt = 0;
+        try {
+            httpClient = new SSLClient();
+            httpPost = new HttpPost(url);
+            httpPost.addHeader("Content-Type", "application/json");
+            String tokenStr = "Bearer " + token;
+            httpPost.addHeader("Authorization", tokenStr);
+            StringEntity se = new StringEntity(jsonstr);
+            se.setContentType("application/json");
+            se.setContentEncoding("utf-8");
+            httpPost.setEntity(se);
+            HttpResponse response = httpClient.execute(httpPost);
+            if (response != null) {
+                HttpEntity resEntity = response.getEntity();
+                if (resEntity != null) {
+                    String result = EntityUtils.toString(resEntity, charset);
+                    //解析json
+                    JsonParser parser = new JsonParser();  //创建JSON解析器
+                    JsonObject object = (JsonObject) parser.parse(result);  //创建JsonObject对象
+                    JsonArray array = object.get("responses").getAsJsonArray().get(0).getAsJsonObject().get("hits").getAsJsonObject().get("hits").getAsJsonArray();
+                    logCnt = object.get("responses").getAsJsonArray().get(0).getAsJsonObject().get("hits").getAsJsonObject().get("total").getAsInt();
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return logCnt;
+    }
 
     /**
      * 员工登录工作站成功的日志
@@ -105,6 +145,7 @@ public class HttpGrafanaAd {
         for (int i = 0; i < array.size(); i++) {
             JsonObject subObject = array.get(i).getAsJsonObject().get("_source").getAsJsonObject();
             LoginStationSucc lss = new LoginStationSucc();
+            lss.setLogId(array.get(i).getAsJsonObject().get("_id").getAsString());
             lss.setTimestamp(utcToString(subObject.get("@timestamp").getAsString()));
             lss.setComputerName(subObject.get("computer_name").getAsString());
             lss.setUserName(subObject.get("event_data").getAsJsonObject().get("TargetUserName").getAsString());
@@ -126,6 +167,8 @@ public class HttpGrafanaAd {
         for (int i = 0; i < array.size(); i++) {
             JsonObject subObject = array.get(i).getAsJsonObject().get("_source").getAsJsonObject();
             LoginStationFail lsf = new LoginStationFail();
+            lsf.setLogId(array.get(i).getAsJsonObject().get("_id").getAsString());
+
             lsf.setTimestamp(utcToString(subObject.get("@timestamp").getAsString()));
             lsf.setComputerName(subObject.get("event_data").getAsJsonObject().get("WorkstationName").getAsString());
             lsf.setUserName(subObject.get("event_data").getAsJsonObject().get("TargetUserName").getAsString());
@@ -146,6 +189,24 @@ public class HttpGrafanaAd {
         try {
             Date date = sdf1.parse(dateUtc);//拿到Date对象
             String result = sdf2.format(date);//输出格式：2017-01-22 09:28:33
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    /**
+     * UTC日期转换
+     * @param str
+     * @return
+     */
+    public static String stringToUTC(String str) {
+        SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+        SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            Date date = sdf2.parse(str + " 00:00:00");//拿到Date对象
+            String result = sdf1.format(date);//输出格式：2017-01-22 09:28:33
             return result;
         } catch (Exception e) {
             e.printStackTrace();
@@ -248,13 +309,14 @@ public class HttpGrafanaAd {
         if(file.exists()){
             file.delete();
         }
+         //0803之后索引为按天
         List<String> list = getBetweenDate(initStart, initEnd);
         list.forEach(time -> {
                     String indexName = "ndf.jcyw.ad-" + time.replace("-", ".");
                     String failStr = "{\"search_type\":\"query_then_fetch\",\"ignore_unavailable\":true,\"index\":[\"" + indexName + "\"],\"max_concurrent_shard_requests\":256}\n" +
-                            "{\"size\":10000,\"query\":{\"bool\":{\"filter\":[{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"event_id: \\\"4625\\\"\"}}]}},\"sort\":{\"@timestamp\":{\"order\":\"asc\",\"unmapped_type\":\"boolean\"}},\"script_fields\":{},\"docvalue_fields\":[\"@timestamp\"]}\n";
+                            "{\"size\":10000,\"query\":{\"bool\":{\"filter\":[{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"event_id: \\\"4625\\\"\"}}]}},\"sort\":{\"@timestamp\":{\"order\":\"desc\",\"unmapped_type\":\"boolean\"}},\"script_fields\":{},\"docvalue_fields\":[\"@timestamp\"]}\n";
                     String succStr = "{\"search_type\":\"query_then_fetch\",\"ignore_unavailable\":true,\"max_concurrent_shard_requests\":256,\"index\":[\"" + indexName + "\"]}\n" +
-                            "{\"size\":10000,\"query\":{\"bool\":{\"filter\":[{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"event_id: \\\"4624\\\"  AND event_data.TargetUserName: xn AND message: \\\"Kerberos\\\"\"}}]}},\"sort\":{\"@timestamp\":{\"order\":\"asc\",\"unmapped_type\":\"boolean\"}},\"script_fields\":{},\"docvalue_fields\":[\"@timestamp\"]}\n";
+                            "{\"size\":10000,\"query\":{\"bool\":{\"filter\":[{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"event_id: \\\"4624\\\"  AND event_data.TargetUserName: xn AND message: \\\"Kerberos\\\"\"}}]}},\"sort\":{\"@timestamp\":{\"order\":\"desc\",\"unmapped_type\":\"boolean\"}},\"script_fields\":{},\"docvalue_fields\":[\"@timestamp\"]}\n";
                     doPostFail(URL, failStr, TOKEN, CHARSET);
                     doPostSucc(URL, succStr, TOKEN, CHARSET);
                     System.out.println(time + "导出完成!!!");
@@ -266,40 +328,32 @@ public class HttpGrafanaAd {
     /**
      * 导出数据增量
      */
-    public static void exportDataInit(String initStart,String initEnd) {
+    public static void exportDataInit() {
         File file  = new File(FILE);
         if(file.exists()){
             file.delete();
         }
         //0803之前索引为 ndf.jcyw.ad-2018
-        List<String> listLong = getBetweenDateLong("2018-01-01","2018-01-02");
-        String indexInit = "ndf.jcyw.ad-2018";
-        for (int i = 1; i < listLong.size(); i++) {
-//            String succInit = "{\"search_type\":\"query_then_fetch\",\"ignore_unavailable\":true,\"index\":[\"ndf.jcyw.ad-2018\"],\"max_concurrent_shard_requests\":256}\n" +
-//                    "{\"size\":10000,\"query\":{\"bool\":{\"filter\":[{\"range\":{\"@timestamp\":{\"gte\":\"" + listLong.get(i-1) + "\",\"lte\":\"" + listLong.get(i) + "\",\"format\":\"epoch_millis\"}}},{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"event_id: \\\"4624\\\"  AND event_data.TargetUserName: xn AND message: \\\"Kerberos\\\"\"}}]}},\"sort\":{\"@timestamp\":{\"order\":\"desc\",\"unmapped_type\":\"boolean\"}},\"script_fields\":{},\"docvalue_fields\":[\"@timestamp\"]}\n";
-//            String failInit = "{\"search_type\":\"query_then_fetch\",\"ignore_unavailable\":true,\"index\":[\"ndf.jcyw.ad-2018\"],\"max_concurrent_shard_requests\":256}\n" +
-//                    "{\"size\":10000,\"query\":{\"bool\":{\"filter\":[{\"range\":{\"@timestamp\":{\"gte\":\"" + listLong.get(i-1)+ "\",\"lte\":\"" + listLong.get(i) + "\",\"format\":\"epoch_millis\"}}},{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"event_id: \\\"4625\\\"\"}}]}},\"sort\":{\"@timestamp\":{\"order\":\"desc\",\"unmapped_type\":\"boolean\"}},\"script_fields\":{},\"docvalue_fields\":[\"@timestamp\"]}\n";
-            String failInit = "{\"search_type\":\"query_then_fetch\",\"ignore_unavailable\":true,\"index\":[\"ndf.jcyw.ad-2018\"],\"max_concurrent_shard_requests\":256}\n" +
-                    "{\"size\":500,\"query\":{\"bool\":{\"filter\":[{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"event_id: \\\"4625\\\"\"}}]}},\"sort\":{\"@timestamp\":{\"order\":\"asc\",\"unmapped_type\":\"boolean\"}},\"script_fields\":{},\"docvalue_fields\":[\"@timestamp\"]}\n";
+//        List<String> listLong = getBetweenDateLong("2018-01-01","2018-01-02");
+//        String[] indexInit = {"ndf.default.jcyw-2018.06","ndf.default.jcyw-2018.07","ndf.jcyw.ad-2018"};
+        String[] indexInit = {"ndf.jcyw.ad-2018"};
+        for (String index:indexInit){
+            if (index.equals("ndf.jcyw.ad-2018")){
+                List<String> listLong1 = getBetweenDate("2018-07-12","2018-08-02");
+                List<String> listLong2 = getBetweenDate("2018-07-13","2018-08-03");
+                for (int i = 0; i < listLong1.size(); i++) {
+                    String succIndex = "{\"search_type\":\"query_then_fetch\",\"ignore_unavailable\":true,\"index\":[\"" + index + "\"],\"max_concurrent_shard_requests\":256}\n" +
+                            "{\"size\":10000,\"query\":{\"bool\":{\"filter\":[{\"range\":{\"@timestamp\":{\"gte\":\"" + DateOper.strToLong(listLong1.get(i)) + "\",\"lte\":\"" + DateOper.strToLong(listLong2.get(i)) + "\",\"format\":\"epoch_millis\"}}},{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"event_id: \\\"4624\\\"  AND event_data.TargetUserName: xn AND message: \\\"Kerberos\\\"\"}}]}},\"sort\":{\"@timestamp\":{\"order\":\"asc\",\"unmapped_type\":\"boolean\"}},\"script_fields\":{},\"docvalue_fields\":[\"@timestamp\"]}\n";
+                    String failIndex = "{\"search_type\":\"query_then_fetch\",\"ignore_unavailable\":true,\"index\":[\"" + index + "\"],\"max_concurrent_shard_requests\":256}\n" +
+                            "{\"size\":500,\"query\":{\"bool\":{\"filter\":[{\"range\":{\"@timestamp\":{\"gte\":\"" + DateOper.strToLong(listLong1.get(i)) + "\",\"lte\":\"" + DateOper.strToLong(listLong2.get(i)) + "\",\"format\":\"epoch_millis\"}}},{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"event_id: \\\"4625\\\"\"}}]}},\"sort\":{\"@timestamp\":{\"order\":\"desc\",\"unmapped_type\":\"boolean\"}},\"script_fields\":{},\"docvalue_fields\":[\"@timestamp\"]}\n";
+                    doPostSucc(URL, succIndex, TOKEN, CHARSET);
+                    doPostFail(URL, failIndex, TOKEN, CHARSET);
+                    System.out.println(listLong1.get(i) + "----" + DateOper.strToLong(listLong1.get(i)));
+                    System.out.println(listLong1.get(i)  + "导出完成!!!");
+                }
+            }
 
-            doPostFail(URL, failInit, TOKEN, CHARSET);
-            //doPostSucc(URL, succInit, TOKEN, CHARSET);
-            System.out.println(new SimpleDateFormat("yyyy-MM-dd").format(new Date(Long.parseLong(listLong.get(i-1))))  + "导出完成!!!");
         }
-        //0803之后索引为按天
-//        List<String> list = getBetweenDate(initStart, initEnd);
-//        list.forEach(time -> {
-//                    String indexName = "ndf.jcyw.ad-" + time.replace("-", ".");
-//                    String failStr = "{\"search_type\":\"query_then_fetch\",\"ignore_unavailable\":true,\"index\":[\"" + indexName + "\"],\"max_concurrent_shard_requests\":256}\n" +
-//                            "{\"size\":10000,\"query\":{\"bool\":{\"filter\":[{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"event_id: \\\"4625\\\"\"}}]}},\"sort\":{\"@timestamp\":{\"order\":\"desc\",\"unmapped_type\":\"boolean\"}},\"script_fields\":{},\"docvalue_fields\":[\"@timestamp\"]}\n";
-//                    String succStr = "{\"search_type\":\"query_then_fetch\",\"ignore_unavailable\":true,\"max_concurrent_shard_requests\":256,\"index\":[\"" + indexName + "\"]}\n" +
-//                            "{\"size\":10000,\"query\":{\"bool\":{\"filter\":[{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"event_id: \\\"4624\\\"  AND event_data.TargetUserName: xn AND message: \\\"Kerberos\\\"\"}}]}},\"sort\":{\"@timestamp\":{\"order\":\"desc\",\"unmapped_type\":\"boolean\"}},\"script_fields\":{},\"docvalue_fields\":[\"@timestamp\"]}\n";
-//                    doPostFail(URL, failStr, TOKEN, CHARSET);
-//                    doPostSucc(URL, succStr, TOKEN, CHARSET);
-//                    System.out.println(time + "导出完成!!!");
-//
-//                }
-//        );
     }
 
     public static void main(String[] args) {
@@ -311,8 +365,9 @@ public class HttpGrafanaAd {
         String endDate = args[1];
         String flag = args[2];
         if (flag.equals("0")){
-            exportDataInit("2018-08-03","2018-09-06");
+            exportDataInit();//0712-0802
+        }else if(flag.equals("1")){
+            exportData(startDate,endDate);
         }
-//        exportData(startDate,endDate);
     }
 }
