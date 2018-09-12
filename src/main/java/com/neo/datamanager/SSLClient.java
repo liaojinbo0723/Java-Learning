@@ -12,14 +12,6 @@ import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-/**
- * 用于进行Https请求的HttpClient
- *
- * @author Devin <xxx>
- * @ClassName: SSLClient
- * @Description: TODO
- * @date 2017年2月7日 下午1:42:07
- */
 public class SSLClient extends DefaultHttpClient {
     public SSLClient() throws Exception {
         super();
