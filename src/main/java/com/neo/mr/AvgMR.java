@@ -16,6 +16,15 @@ import java.util.StringTokenizer;
 
 public class AvgMR {
 
+
+     /**
+     * 四个泛型类型分别代表：
+     * KeyIn        Mapper的输入数据的Key，这里是每行文字的起始位置（0,11,...）
+     * ValueIn      Mapper的输入数据的Value，这里是每行文字
+     * KeyOut       Mapper的输出数据的Key，这里是每行文字中的姓名
+     * ValueOut     Mapper的输出数据的Value，这里是每行文字中的成绩
+     */
+
     public static class Map extends Mapper<LongWritable, Text, Text, IntWritable> {
 
         @Override
